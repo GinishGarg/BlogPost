@@ -1,0 +1,31 @@
+{% extends 'navbar.html'%}
+{% block content%}
+{% for message in get_flashed_messages()%}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+    {{message}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+
+{%endfor%}
+{% if name%}
+    <h1> hello {{name}}</h1>
+    <img src="{{url_for('static',filename='images/blog.avif')}}" width="1500" height="560">
+{%else%}
+    <h1>Sign in</h1>
+</br>
+    <form method="POST">
+        {{form.hidden_tag()}}
+        {{form.name.label}}
+        {{form.name(class="form-label")}}
+</br>
+        {{form.email.label}}
+        {{form.email(class="form-label"
+        )}}
+</br>
+        {{form.submit(class="btn btn-dark")}}
+
+
+
+    </form>
+{% endif %}
+{% endblock %}
