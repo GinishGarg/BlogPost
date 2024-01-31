@@ -16,15 +16,24 @@
 <div class="shadow p-3 mb-5 bg-body-tertiary rounded">
     <form method="POST">
         {{form.hidden_tag()}}
-        {{form.name.label}}</br>
-        {{form.name(class="form-label")}}
+        {{form.name.label(class="form-label")}}</br>
+        {{form.name(class="form-control")}}
 </br>
-        {{form.email.label}}</br>
-        {{form.email(class="form-label"
+        {{form.username.label(class="form-label")}}</br>
+        {{form.username(class="form-control")}}
+</br>
+        {{form.email.label(class="form-label")}}</br>
+        {{form.email(class="form-control"
         )}}
         </br>
-        {{form.favorite_color.label}}</br>
-        {{form.favorite_color(class="form-label")}}
+        {{form.favorite_color.label(class="form-label")}}</br>
+        {{form.favorite_color(class="form-control")}}
+    </br>
+        {{form.password_hash.label(class="form-label")}}</br>
+        {{form.password_hash(class="form-control")}}
+</br>
+        {{form.password_hash2.label(class="form-label")}}</br>
+        {{form.password_hash2(class="form-control")}}
 </br>
         {{form.submit(class="btn btn-dark")}}
 
@@ -38,7 +47,7 @@
 <table class="table table-striped">
 {% for user in our_users %}
     <tr>
-    <td>{{user.id}}.<a href="{{url_for('update',id=user.id)}}">{{user.name|capitalize}}</a> - {{user.email}}-{{user.favorite_color}}</br></td>
+    <td>{{user.id}}.<a href="{{url_for('update',id=user.id)}}">{{user.name|capitalize}}</a> -{{user.username}} {{user.email}}-{{user.favorite_color}}-{{user.password_hash}}-<a href="{{url_for('delete_user',id=user.id)}}">Delete</a></br></td>
     </tr>
 {% endfor %}
 </table>

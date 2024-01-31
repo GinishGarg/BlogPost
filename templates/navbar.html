@@ -37,13 +37,35 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <!-- <li class="nav-item">
+            <a class="nav-link active" href="{{url_for('test_pw')}}">Signin</a>
+          </li> -->
+          {% if current_user.is_authenticated %}
           <li class="nav-item">
-            <a class="nav-link active" href="{{url_for('signin')}}">Signin</a>
+            <a class="nav-link active" href="{{url_for('dashboard')}}">DashBoard</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="{{url_for('signup')}}">signup</a>
+            <a class="nav-link active" href="{{url_for('logout')}}">Logout</a>
           </li>
-          <li class="nav-item dropdown">
+
+          {%else%}
+          <li class="nav-item">
+            <a class="nav-link active" href="{{url_for('login')}}">Login</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="{{url_for('signup')}}">Signup</a>
+          </li>
+          {% endif %}
+
+         
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="{{url_for('add_post')}}">Add Post</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="{{url_for('posts')}}">Blogs</a>
+          </li>
+          <!-- <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               Dropdown
             </a>
@@ -52,7 +74,7 @@
               <li><a class="dropdown-item" href="#">Another action</a></li>
               <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item" href="#">Something else here</a></li>
-            </ul>
+            </ul> -->
           </li>
           <!-- <li class="nav-item">
             <a class="nav-link disabled" aria-disabled="true">Disabled</a>

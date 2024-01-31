@@ -7,25 +7,26 @@
   </div>
 
 {%endfor%}
-{% if name%}
-    <h1> hello {{name}}</h1>
-    <img src="{{url_for('static',filename='images/blog.avif')}}" width="1500" height="560">
-{%else%}
-    <h1>Sign in</h1>
+
+    <h1> Login </h1>
+   <!-- <img src=/"{{url_for('static',filename='images/blog.avif')}}" width="1500" height="560">-->
+
 </br>
+<div class="shadow p-3 mb-5 bg-body-tertiary rounded">
     <form method="POST">
         {{form.hidden_tag()}}
-        {{form.name.label}}
-        {{form.name(class="form-label")}}
-</br>
-        {{form.email.label}}
-        {{form.email(class="form-label"
-        )}}
+        {{form.username.label(class="form-label")}}</br>
+        {{form.username(class="form-control")}}
+    </br>
+        {{form.password.label(class="form-label")}}</br>
+        {{form.password(class="form-control")}}
+        
 </br>
         {{form.submit(class="btn btn-dark")}}
 
 
 
     </form>
-{% endif %}
+</div>
+    
 {% endblock %}
