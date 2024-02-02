@@ -53,12 +53,16 @@
             <a class="nav-link active" href="{{url_for('login')}}">Login</a>
           </li>
 
+
           <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="{{url_for('signup')}}">Signup</a>
           </li>
           {% endif %}
-
-         
+        {% if current_user.id==8%}
+          <li class="nav-item">
+            <a class="nav-link active" href="{{url_for('admin')}}">Admin</a>
+          </li>
+        {% endif%}
           <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="{{url_for('add_post')}}">Add Post</a>
           </li>
@@ -80,8 +84,9 @@
             <a class="nav-link disabled" aria-disabled="true">Disabled</a>
           </li> -->
         </ul>
-        <form class="d-flex" role="search">
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+        <form method="POST" action="{{url_for('search')}}"class="d-flex" role="search">
+              {{form.hidden_tag()}}
+          <input class="form-control me-2" name="searched" type="search" placeholder="Search" aria-label="Search">
           <button class="btn btn-success" type="submit">Search</button>
         </form>
       </div>

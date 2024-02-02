@@ -6,27 +6,21 @@
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
   </div>
 
-{%endfor%}
-{% if name%}
-    <h1> Update User.</h1>
-</br></br>
-   <!-- <img src=/"{{url_for('static',filename='images/blog.avif')}}" width="1500" height="560">-->
-   <h3> Users List:</h3>
-<table class="table table-striped">
-{% for user in our_users %}
-    <tr>
-    <td>{{user.id}}.{{user.name}} - {{user.email}}-{{user.favorite_color}}</br></td>
-    </tr>
-{% endfor %}
-</table>
-{%else%} 
+{%endfor%} 
+{%if id==current_user.id%}
     <h1>Update user...</h1>
-</br>
+</br></br>
+        <p>ID to Update: {{id}}</p>
+        <p>current id: {{current_user.id}}</p>
+</br></br>
 <div class="shadow p-3 mb-5 bg-body-tertiary rounded">
     <form action="/update/{{name_to_update.id}}" method="POST">
         {{form.hidden_tag()}}
         {{form.name.label}}</br>
         {{form.name(class="form-label",value=name_to_update.name)}}
+</br>
+        {{form.username.label}}</br>
+        {{form.username(class="form-label",value=name_to_update.username)}}
 </br>
         {{form.email.label}}</br>
         {{form.email(class="form-label"
@@ -43,7 +37,14 @@
 
     </form>
 </div>
-    {% endif %}
-</br></br>
+{%else%}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+    You can't edit this user!
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  
+  </div>
+  <h2>Access Denied!</h2>
+    <p>Sorry! Tou cannot access this user profile...</p>
 
+{% endif %}
 {% endblock %}

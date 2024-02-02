@@ -7,7 +7,7 @@
     </div>
 
 {%endfor%}
-<h1>Blog Post</h1>
+<h1>Edit Post...</h1>
 </br>
 
 <div class="shadow-sm p-3 mb-5 bg-body-tertiary rounded">
@@ -17,9 +17,7 @@
         {{form.title.label(class="form-label")}}</br>
         {{form.title(class="form-control")}}
 </br>
-        {{form.author.label(class="form-label")}}</br>
-        {{form.author(class="form-control" )}}
-        </br>
+       
         {{form.slug.label(class="form-label")}}</br>
         {{form.slug(class="form-control")}}
 </br>
@@ -30,6 +28,8 @@
         {{form.submit(class="btn btn-dark")}}
 
     </form>
+    {{ ckeditor.load() }}
+    {{ ckeditor.config(name='body') }}
     </div>
 
 
