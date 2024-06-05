@@ -6,16 +6,25 @@ from werkzeug.security import generate_password_hash,check_password_hash
 from flask_login import login_user,UserMixin,LoginManager,login_required,logout_user,current_user
 from webforms import Namerform ,passwordform , LoginForm , PostForm,SearchForm
 from flask_ckeditor import CKEditor
+from werkzeug.utils import secure_filename
+import uuid as uuid
+import os
 
 
 app=Flask(__name__)
 ckeditor=CKEditor(app)
 app.config['SECRET_KEY']="My secret super key"
+
+
 # app.config["SQLALCHEMY_DATABASE_URI"]="sqlite:///users.db"
 app.config["SQLALCHEMY_DATABASE_URI"]="postgresql://postgres:test@localhost:5432/Users"
 
 db=SQLAlchemy(app)
 migrate=Migrate(app,db)
+
+UPLOAD_FOLDER='static/images/'
+app.config['UPLOAD_FOLDER']=UPLOAD_FOLDER
+
 
 
 @app.route('/adminster')
@@ -53,27 +62,29 @@ def add_post():
 @app.route("/delete/<int:id>")
 @login_required
 def delete_user(id):
-    user_to_delete = Users.query.get_or_404(id)
-    name = None
-    email = None
-    form = Namerform()
-    try:
-        db.session.delete(user_to_delete)
-        db.session.commit()
-        flash("User deleted successfully!")
-        our_users = Users.query.order_by(Users.date_added)
-        return render_template('signup.html', name=name, email=email, form=form, our_users=our_users)
+    if id==current_user.id or id==8:
+        user_to_delete = Users.query.get_or_404(id)
+        name = None
+        email = None
+        form = Namerform()
+        try:
+            db.session.delete(user_to_delete)
+            db.session.commit()
+            flash("User deleted successfully!")
+            our_users = Users.query.order_by(Users.date_added)
+            return render_template('signup.html', name=name, email=email, form=form, our_users=our_users)
 
-    except:
-        flash("There was a problem deleting the user")
-        return render_template('signup.html', name=name, email=email, form=form, our_users=our_users)
-
-
+        except:
+            flash("There was a problem deleting the user")
+            return render_template('signup.html', name=name, email=email, form=form, our_users=our_users)
+    else:
+        flash('You don\'t have the permission to delete this user')
+        return redirect(url_for('dashboard'))
 @app.route('/posts/delete/<int:id>')
 def delete_post(id):
     post_to_delete=Posts.query.get_or_404(id)
     id=current_user.id
-    if id==post_to_delete.poster_id:
+    if id==post_to_delete.poster_id or id==8:
 
         try:
             db.session.delete(post_to_delete)
@@ -135,27 +146,54 @@ def login():
         if user:
             if check_password_hash(user.password_hash,form.password.data):
                 login_user(user)
-                flash('Login Successfull!!')
+                flash('Login Successfull!!','success')
                 return redirect(url_for('dashboard'))
             else:
-                flash("Wrong Password Try Again")   
+                flash("Wrong Password Try Again",'error')   
         else:
-            flash("That user does not exist")         
+            flash("That user does not exist",'error')         
             
     return render_template('login.html',form=form)
 
 @app.route('/dashboard',methods=["POST","GET"])
 @login_required
 def dashboard():
-    form=LoginForm()
-    return render_template('dashboard.html',form=form)
+    form = Namerform()
+    id=current_user.id  
+    name_to_update = Users.query.get_or_404(id)
+    if request.method == "POST":
+        name_to_update.name = request.form['name']
+        name_to_update.email = request.form['email']
+        name_to_update.favorite_color = request.form['favorite_color']
+        name_to_update.username = request.form['username']
+        name_to_update.about_author = request.form['about_author']
+        name_to_update.profile_pic = request.files['profile_pic']
+        if request.files['profile_pic']:
+
+            pic_filename=secure_filename(name_to_update.profile_pic.filename)
+            pic_name=str(uuid.uuid1()) + "_" + pic_filename
+        
+            name_to_update.profile_pic.save(os.path.join(app.config['UPLOAD_FOLDER']),pic_name)
+            
+            name_to_update.profile_pic=pic_name
+            try:
+                db.session.commit()
+                flash("User updated successfully.")
+                return render_template("dashboard.html", form=form, name_to_update=name_to_update)
+            except:
+                flash("Error! Try again later...")
+                return render_template("dashboard.html", form=form, name_to_update=name_to_update,id=id)
+        else:
+            db.session.commit()
+            flash("User updated successfully.")
+            return render_template("dashboard.html", form=form, name_to_update=name_to_update)
+    else:
+        return render_template("dashboard.html", form=form, name_to_update=name_to_update,id=id)
+    
 #create a blog post model
-
-
 # create show blog page
 @app.route('/posts')
 def posts():
-
     posts=Posts.query.order_by(Posts.date_posted)
     return render_template("posts.html",posts=posts)
 
@@ -177,7 +215,7 @@ def edit_post(id):
         db.session.commit()
         flash('Post has beeen Updated!')
         return redirect(url_for('post',id=post.id))
-    if current_user.id==post.poster_id:
+    if current_user.id==post.poster_id or id==8:
         form.title.data=post.title
         form.slug.data=post.slug
         form.content.data=post.content
@@ -272,20 +310,35 @@ def test_pw():
 def update(id):
     form = Namerform()
     name_to_update = Users.query.get_or_404(id)
-    if request.method == "POST":
+    if request.method == "POST" and id==current_user.id:
         name_to_update.name = request.form['name']
         name_to_update.email = request.form['email']
         name_to_update.favorite_color = request.form['favorite_color']
         name_to_update.username = request.form['username']
-        try:
+        name_to_update.about_author=request.form['about_author']
+       
+        if request.files['profile_pic']:
+            name_to_update.profile_pic = request.files['profile_pic']
+            pic_filename=secure_filename(name_to_update.profile_pic.filename)
+            pic_name=str(uuid.uuid1()) + "_" + pic_filename
+        
+            name_to_update.profile_pic.save(os.path.join(app.config['UPLOAD_FOLDER'],pic_name))
+            
+            name_to_update.profile_pic=pic_name
+            try:
+                db.session.commit()
+                flash("User updated successfully.")
+                return render_template("dashboard.html", form=form, name_to_update=name_to_update)
+            except:
+                flash("Error! Try again later...")
+                return render_template("dashboard.html", form=form, name_to_update=name_to_update,id=id)
+        else:
             db.session.commit()
             flash("User updated successfully.")
-            return render_template("update.html", form=form, name_to_update=name_to_update)
-        except:
-            flash("Error! Try again later...")
-            return render_template("update.html", form=form, name_to_update=name_to_update,id=id)
+            return render_template("dashboard.html", form=form, name_to_update=name_to_update)
     else:
-        return render_template("update.html", form=form, name_to_update=name_to_update,id=id)
+        return render_template("dashboard.html", form=form, name_to_update=name_to_update,id=id)
+    
 				
 class Users(db.Model,UserMixin):
     _table_="signup"
@@ -294,9 +347,11 @@ class Users(db.Model,UserMixin):
     name=db.Column(db.String(100),nullable=False)
     email=db.Column(db.String(150),nullable=False,unique=True)
     favorite_color=db.Column(db.String(100))
+    profile_pic=db.Column(db.String(),nullable=True)
+    about_author=db.Column(db.Text)
     date_added=db.Column(db.DateTime, default=datetime.utcnow,nullable=False)
     password_hash=db.Column(db.String(1020))
-    #User can hav emany posts
+    #User can have many posts
     posts= db.relationship('Posts',backref="poster")
 
 

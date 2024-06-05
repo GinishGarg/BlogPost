@@ -1,7 +1,8 @@
-from wtforms import StringField,SubmitField,EmailField,PasswordField,BooleanField,ValidationError
+from wtforms import StringField,SubmitField,EmailField,PasswordField,BooleanField,ValidationError,TextAreaField
 from wtforms.validators import DataRequired,Email,EqualTo,Length
 from wtforms.widgets import TextArea
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField
 from flask_ckeditor import CKEditorField
 
 class SearchForm(FlaskForm):
@@ -37,6 +38,8 @@ class Namerform(FlaskForm):
     username=StringField("UserName", validators=[DataRequired()])
     email=EmailField("Enter email",validators=[Email()])
     favorite_color=StringField("Favorite color")
+    about_author=TextAreaField("About The Author")
+    profile_pic=FileField("Profile Pic")
     password_hash=PasswordField("Password",validators=[DataRequired(),EqualTo('password_hash2',message='Passwords must match')])
     password_hash2=PasswordField("Confirm Password",validators=[DataRequired()])
     submit=SubmitField("submit")
